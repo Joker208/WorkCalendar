@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+//运行
 func Run(name string, f func() error) {
 	fmt.Println("数据" + name + "开始...")
 	s := spinner.New(spinner.CharSets[36], 100*time.Millisecond)
@@ -26,6 +27,7 @@ func Run(name string, f func() error) {
 	fmt.Println("数据" + name + "成功...")
 }
 
+//判断文件是否存在
 func FileExists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
@@ -33,6 +35,29 @@ func FileExists(name string) bool {
 		}
 	}
 	return true
+}
+
+// 计算日期相差多少月
+func SubMonth(t1, t2 time.Time) (month int) {
+	y1 := t1.Year()
+	y2 := t2.Year()
+	m1 := int(t1.Month())
+	m2 := int(t2.Month())
+	d1 := t1.Day()
+	d2 := t2.Day()
+
+	yearInterval := y1 - y2
+	if m1 < m2 || m1 == m2 && d1 < d2 {
+		yearInterval--
+	}
+	// 获取月数差值
+	monthInterval := (m1 + 12) - m2
+	//if d1 < d2 {
+	//	monthInterval--
+	//}
+	monthInterval %= 12
+	month = yearInterval*12 + monthInterval + 1
+	return
 }
 
 // excel日期字段格式化 yyyy-mm-dd

@@ -9,20 +9,37 @@ import (
 func Calendar() (err error) {
 	// 创建工作簿
 	f := excelize.NewFile()
+
+	for k, v := range sheetNameList {
+		err = NewMonthSheet(f, k, v)
+		if err != nil {
+			continue
+		}
+	}
+
+	// 保存工作簿
+	savePath := filepath.Join(dirPath, appConfig.CalendarName)
+	//fmt.Println("导出文件路径为：" + savePath)
+	if err = f.SaveAs(savePath); err != nil {
+		return err
+	}
+	return nil
+}
+
+func NewMonthSheet(f *excelize.File, k int, sheetName string) (err error) {
 	var (
 		monthStyle, titleStyle, dataStyle, blankStyle int
 		addr                                          string
-		sheet                                         = appConfig.SheetName
-		// 自定义行高
-		//height = map[int]float64{
-		//	1: 45, 3: 22, 5: 44, 7: 44, 9: 44, 11: 44, 13: 44,
-		//}
-		top    = excelize.Border{Type: "top", Style: 1, Color: "DADEE0"}
-		left   = excelize.Border{Type: "left", Style: 1, Color: "DADEE0"}
-		right  = excelize.Border{Type: "right", Style: 1, Color: "DADEE0"}
-		bottom = excelize.Border{Type: "bottom", Style: 1, Color: "DADEE0"}
-		//fill   = excelize.Fill{Type: "pattern", Color: []string{"EFEFEF"}, Pattern: 1}
+		sheet                                         = "Sheet1"
+		top                                           = excelize.Border{Type: "top", Style: 1, Color: "DADEE0"}
+		left                                          = excelize.Border{Type: "left", Style: 1, Color: "DADEE0"}
+		right                                         = excelize.Border{Type: "right", Style: 1, Color: "DADEE0"}
+		bottom                                        = excelize.Border{Type: "bottom", Style: 1, Color: "DADEE0"}
 	)
+
+	if k > 0 {
+		f.NewSheet(sheet)
+	}
 
 	//例子
 	//excelData = map[int][]interface{}{
@@ -41,7 +58,7 @@ func Calendar() (err error) {
 	//}
 
 	// 按行赋值
-	for r, row := range excelData {
+	for r, row := range excelDataList[k] {
 		if addr, err = excelize.JoinCellName("A", r); err != nil {
 			return err
 		}
@@ -50,7 +67,7 @@ func Calendar() (err error) {
 		}
 	}
 	// 设置自定义行高
-	for r, ht := range heightList {
+	for r, ht := range heightMapList[k] {
 		if err = f.SetRowHeight(sheet, r, ht); err != nil {
 			return err
 		}
@@ -96,7 +113,7 @@ func Calendar() (err error) {
 		return err
 	}
 	// 设置日期单元格样式
-	for _, r := range rowList {
+	for _, r := range rowsDateList[k] {
 		if err = f.SetCellStyle(sheet, "A"+strconv.Itoa(r),
 			"G"+strconv.Itoa(r), dataStyle); err != nil {
 			return err
@@ -115,71 +132,12 @@ func Calendar() (err error) {
 		return err
 	}
 	// 设置空白单元格样式
-	for _, r := range rowList1 {
+	for _, r := range rowsContentList[k] {
 		if err = f.SetCellStyle(sheet, "A"+strconv.Itoa(r),
 			"G"+strconv.Itoa(r), blankStyle); err != nil {
 			return err
 		}
 	}
-	//// 创建上个月和下个月日期中的空白单元格样式
-	//if grayBlankStyle, err = f.NewStyle(&excelize.Style{
-	//	Border: []excelize.Border{left, right, bottom},
-	//	Fill:   fill}); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	// 设置上个月和下个月日期中的空白单元格样式
-	//if err = f.SetCellStyle(sheet, "A5", "E5", grayBlankStyle); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//if err = f.SetCellStyle(sheet, "E13", "G13", grayBlankStyle); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	// 创建上个月和下个月日期的单元格样式
-	//if grayDataStyle, err = f.NewStyle(&excelize.Style{
-	//	Border: []excelize.Border{left, right, top},
-	//	Font:   &excelize.Font{Color: "777777"}, Fill: fill}); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	// 设置上个月和下个月日期的单元格样式
-	//if err = f.SetCellStyle(sheet, "A4", "E4", grayDataStyle); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//if err = f.SetCellStyle(sheet, "E12", "G12", grayDataStyle); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//// 创建笔记单元格样式
-	//if noteStyle, err = f.NewStyle(&excelize.Style{
-	//	Font: &excelize.Font{Color: "1f7f3b", Bold: true, Size: 14, Family: "Microsoft YaHei"},
-	//}); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//// 设置笔记单元格样式
-	//if err = f.SetCellStyle(sheet, "B18", "B18", noteStyle); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//// 创建笔记区域横线样式
-	//if noteLineStyle, err = f.NewStyle(&excelize.Style{
-	//	Border: []excelize.Border{{Type: "bottom", Style: 4, Color: "DDDDDD"}},
-	//}); err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//// 设置笔记区域横线样式
-	//for r := 19; r < 25; r++ {
-	//	if err = f.SetCellStyle(sheet, "B"+strconv.Itoa(r),
-	//		"H"+strconv.Itoa(r), noteLineStyle); err != nil {
-	//		fmt.Println(err)
-	//		return
-	//	}
-	//}
 	// 隐藏工作表网格线
 	if err = f.SetSheetViewOptions(sheet, 0,
 		excelize.ShowGridLines(false)); err != nil {
@@ -187,11 +145,6 @@ func Calendar() (err error) {
 	}
 	// 重命名工作表
 	f.SetSheetName(sheet, sheetName)
-	// 保存工作簿
-	savePath := filepath.Join(dirPath, appConfig.CalendarName)
-	//fmt.Println("导出文件路径为：" + savePath)
-	if err = f.SaveAs(savePath); err != nil {
-		return err
-	}
+
 	return nil
 }

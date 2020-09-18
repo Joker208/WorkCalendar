@@ -9,6 +9,7 @@ import (
 var (
 	excelContent map[string][]string
 	dateNum      map[string]int
+	lastDay      string
 )
 
 func Scan() (err error) {
@@ -40,6 +41,7 @@ func Scan() (err error) {
 	}
 
 	//fmt.Println(len(rows))
+	lastDayNum := ""
 
 	for i := 1; i < len(rows); i++ {
 		rowLen := len(rows[i])
@@ -63,6 +65,10 @@ func Scan() (err error) {
 			task = rowTemp[1]
 		} else {
 			rowTemp[1] = task
+		}
+
+		if rowTemp[2] > lastDayNum {
+			lastDayNum = rowTemp[2]
 		}
 
 		//以日期为准合并内容
@@ -95,10 +101,7 @@ func Scan() (err error) {
 			dateNum[date] = 1
 		}
 		excelContent[date] = append(excelContent[date], content)
-		//fmt.Println("excelContent")
-		//fmt.Println(excelContent)
-		//fmt.Println("dateNum")
-		//fmt.Println(dateNum)
 	}
+	lastDay = ConvertToFormatDay(lastDayNum)
 	return nil
 }

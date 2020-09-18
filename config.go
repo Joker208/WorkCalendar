@@ -20,7 +20,6 @@ var (
 )
 
 func init() {
-
 	//配置文件路径
 	appPath, err := filepath.Abs(filepath.Dir(os.Args[0]));
 	if err != nil {
