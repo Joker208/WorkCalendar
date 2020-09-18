@@ -1,12 +1,10 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/briandowns/spinner"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -26,31 +24,6 @@ func Run(name string, f func() error) {
 	time.Sleep(time.Second * 1)
 	s.Stop()
 	fmt.Println("数据" + name + "成功...")
-}
-
-//查找文件目录
-func FindPath() (path, filePath string, err error) {
-
-	appPath, err := filepath.Abs(filepath.Dir(os.Args[0]));
-	if err != nil {
-		return "", "", err
-	}
-	path = appPath
-	workPath, err := os.Getwd()
-	if err != nil {
-		return "", "", err
-	}
-	var filename = "1.xlsx"
-
-	filePath = filepath.Join(workPath, filename)
-	if !FileExists(filePath) {
-		filePath = filepath.Join(appPath, filename)
-		path = appPath
-		if !FileExists(filePath) {
-			return "", "", errors.New("文件不存在")
-		}
-	}
-	return path, filePath, nil
 }
 
 func FileExists(name string) bool {

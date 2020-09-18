@@ -4,7 +4,6 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"path/filepath"
 	"strconv"
-	"time"
 )
 
 func Calendar() (err error) {
@@ -13,7 +12,7 @@ func Calendar() (err error) {
 	var (
 		monthStyle, titleStyle, dataStyle, blankStyle int
 		addr                                          string
-		sheet                                         = "Sheet1"
+		sheet                                         = appConfig.SheetName
 		// 自定义行高
 		//height = map[int]float64{
 		//	1: 45, 3: 22, 5: 44, 7: 44, 9: 44, 11: 44, 13: 44,
@@ -189,8 +188,7 @@ func Calendar() (err error) {
 	// 重命名工作表
 	f.SetSheetName(sheet, sheetName)
 	// 保存工作簿
-	saveName := "工作日历" + time.Now().Format("20060102150405") + ".xlsx"
-	savePath := filepath.Join(path, saveName)
+	savePath := filepath.Join(dirPath, appConfig.CalendarName)
 	//fmt.Println("导出文件路径为：" + savePath)
 	if err = f.SaveAs(savePath); err != nil {
 		return err

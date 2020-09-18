@@ -3,23 +3,19 @@ package main
 import (
 	"errors"
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
+	"path/filepath"
 )
 
 var (
 	excelContent map[string][]string
 	dateNum      map[string]int
-	path         string
 )
 
 func Scan() (err error) {
 
 	var popo, task = "", ""
-	var filePath = ""
-	path, filePath, err = FindPath()
-	if err != nil {
-		return err
-	}
 
+	filePath := filepath.Join(dirPath, appConfig.FileName)
 	f, err := excelize.OpenFile(filePath)
 	if err != nil {
 		return err
@@ -34,7 +30,7 @@ func Scan() (err error) {
 	//按日期分组
 	excelContent = make(map[string][]string)
 	dateNum = make(map[string]int)
-	titleList := [18]string{"aaa","bbb", "ccc"}
+	titleList := appConfig.TitleList
 
 	// 获取 Sheet1 上所有单元格
 	rows, err := f.GetRows("Sheet1")
@@ -75,11 +71,12 @@ func Scan() (err error) {
 		if _, ok := excelContent[date]; ok {
 			//存在相同日期
 			for j := 0; j < rowLen; j++ {
-				//空置和日期不记录
-				//if rowTemp[j] != "" && j != 2 && j != 3 {
-
-				//改为只记录任务和内容
+				//任务和内容单独样式
 				if j == 1 || j == 4 {
+					content += rowTemp[j] + "\n"
+				}
+				//空值不记录
+				if rowTemp[j] != "" && j > 4 {
 					content += titleList[j] + ":" + rowTemp[j] + ";"
 				}
 			}
@@ -87,11 +84,10 @@ func Scan() (err error) {
 		} else {
 			//新建日期事件
 			for j := 0; j < rowLen; j++ {
-				//空置和日期不记录
-				//if rowTemp[j] != "" && j != 2 && j != 3 {
-
-				//改为只记录任务和内容
 				if j == 1 || j == 4 {
+					content += rowTemp[j] + "\n"
+				}
+				if rowTemp[j] != "" && j > 4 {
 					content += titleList[j] + ":" + rowTemp[j] + ";"
 				}
 			}

@@ -9,4 +9,5 @@ require (
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	golang.org/x/sys v0.0.0-20200916084744-dbad9cb7cb7a // indirect
+	gopkg.in/ini.v1 v1.61.0
 )
